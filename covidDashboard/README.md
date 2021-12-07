@@ -1,5 +1,18 @@
 # Covid Dashboard
 
+El siguiente docker-compose tiene como objetivo:
+
+1. Crear contenedores y sus configuraciones para:
+- airflow y postgres
+- mysql
+- streamlit
+
+2. A manera de demo:
+- Se definió el data.csv con datos simples id,name
+- Se creó una base de datos dm_covid con una tabla covid y dos campos
+- Se creó un DAG para leer data.csv y trasladarlos a la tabla dm_covid.covid
+- Por medio de streamlite se consulta a la bd y se visualizan los datos.
+
 ### Configurando infraestructura
 
 - `docker-compose build`
@@ -15,3 +28,10 @@
 
 1. Ir a http://localhost:8501/
 2. Se podrán visualizar los datos de Mysql cargados vía DAG en airflow
+
+### Infraestructura
+
+![Infraestructura](https://github.com/CarlosGarlem/productdev_covid/blob/main/covidDashboard/img/InfraestructuraCovidDashboard.png?raw=true)
+
+### Evidencia de funcionamiento
+![Funcionamiento](https://github.com/CarlosGarlem/productdev_covid/blob/main/covidDashboard/img/execute.png?raw=true)
