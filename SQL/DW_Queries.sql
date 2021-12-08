@@ -1,8 +1,5 @@
-#SCHEMA DEFINITION------------------------------------------------------------------------------------------------------
-DROP SCHEMA IF EXISTS dm_covid;
-CREATE SCHEMA dm_covid;
+#USE SCHEMA-------------------------------------------------------------------------------------------------------------
 USE dm_covid;
-
 
 #TABLE DEFINITIONS------------------------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS d_region;
@@ -12,8 +9,8 @@ CREATE TABLE d_region(
     province_state VARCHAR(100) NOT NULL,
     bk_country_region INT NOT NULL,
     country_region VARCHAR(100) NOT NULL,
-    lat FLOAT NOT NULL,
-    `long` FLOAT NOT NULL
+    lat FLOAT NULL,
+    `long` FLOAT NULL
 );
 
 
@@ -65,7 +62,7 @@ CREATE PROCEDURE InsertCalendar(dt DATE)
         , MONTHNAME(dt)
         , CONCAT(EXTRACT(YEAR FROM dt), RIGHT(CONCAT('0', EXTRACT(QUARTER FROM dt)),2))
         , EXTRACT(QUARTER FROM dt)
-        , IF(EXTRACT(QUARTER FROM dt) < 3, CAST(CONCAT(EXTRACT(YEAR FROM @dt), '01') AS SIGNED),
+        , IF(EXTRACT(QUARTER FROM dt) < 3, CAST(CONCAT(EXTRACT(YEAR FROM dt), '01') AS SIGNED),
              CAST(CONCAT(EXTRACT(YEAR FROM dt), '02') AS SIGNED))
         , IF(EXTRACT(QUARTER FROM dt) < 3, 1, 2)
         , EXTRACT(YEAR FROM dt)
@@ -113,7 +110,7 @@ SELECT
 #RUN GenerateCalendar---------------------------------------------------------------------------------------------------
 SET @date_start = CAST('2019-01-01' as date);
 SET @date_end = CAST('2022-12-31' as date);
-CALL GenerateCalendar(@date_start, @date_end)
+CALL GenerateCalendar(@date_start, @date_end);
 
 SELECT * FROM d_date LIMIT 1000;
 SELECT year, count(distinct date)
