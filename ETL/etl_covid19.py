@@ -26,7 +26,11 @@ def transform_wide_to_long(covid_df):
 def transform_compute_delta(df):
     df["date"] = pd.to_datetime(df.date, format="%m/%d/%y")
     res = df.sort_values(by=['Country/Region', 'Province/State', "date"])
-    n_cases = pd.concat([pd.Series([0]), res.n_cases])
-    res["delta"] = n_cases.diff()[1:]
+    res["delta"] = res["n_cases"].diff()
+    
+    ### Fix first observation for each Country - Province
+    different_loc = df[['Country/Region', "Province/State"]].drop_duplicates().shape[0]
+    res.loc[range(0, different_loc), "delta"] = res.loc[range(0, different_loc), "n_cases"]
     return res
+
 
