@@ -2,6 +2,11 @@ import streamlit as st
 import mysql.connector as mysql
 import pandas as pd
 
+st.set_page_config(page_title="Streamlit COVID Dashboard", layout="wide")
+
+st.sidebar.markdown("## Dashboard sidebar")
+
+
 st.title("Datos desde Mysql provenientes del ETL")
 
 db = mysql.connect(
