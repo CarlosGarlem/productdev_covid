@@ -19,6 +19,9 @@ import os
 
 FILE_CONNECTION_NAME = 'fs_data'
 CONNECTION_DB_NAME = 'covid_db'
+FILE_NAMES = {'confirmed': 'time_series_covid19_confirmed_global.csv',
+            'deaths': 'time_series_covid19_deaths_global.csv',
+            'recovered': 'time_series_covid19_recovered_global.csv'}
 
 dag = DAG('covid_cases_dag', 
         description='Process to ingest confirmed cases.',
@@ -44,11 +47,10 @@ end = DummyOperator(task_id='end', dag=dag)
 
 # Ingestion process
 def ingestion_process(**kwargs) -> None:
-    report_type = kwargs['type']
     engine = MySqlHook(mysql_conn_id=CONNECTION_DB_NAME)\
         .get_sqlalchemy_engine()
     etl = CovidFile(file_path=FSHook(FILE_CONNECTION_NAME).get_path(),
-                    file_name=f'time_series_covid19_{report_type}_global.csv',
+                    file_names=FILE_NAMES,
                     db_con=engine)
     etl.run()
 
@@ -75,43 +77,31 @@ def build_fact_covid(**kwargs) -> None:
 # Sensors
 sensor_confirmed = FileSensor(task_id="file_sensor_task_confirmed",
                     dag=dag,
-                    filepath='time_series_covid19_confirmed_global.csv',
+                    filepath=FILE_NAMES['confirmed'],
                     fs_conn_id=FILE_CONNECTION_NAME,
                     poke_interval=10,
                     timeout=600)
 
 sensor_deaths = FileSensor(task_id="file_sensor_task_deaths",
                     dag=dag,
-                    filepath='time_series_covid19_deaths_global.csv',
+                    filepath=FILE_NAMES['deaths'],
                     fs_conn_id=FILE_CONNECTION_NAME,
                     poke_interval=10,
                     timeout=600)
 
 sensor_recovered = FileSensor(task_id="file_sensor_task_recovered",
                     dag=dag,
-                    filepath='time_series_covid19_recovered_global.csv',
+                    filepath=FILE_NAMES['deaths'],
                     fs_conn_id=FILE_CONNECTION_NAME,
                     poke_interval=10,
                     timeout=600)
 
-# Ingestion Operators
-ingestion_confirmed = PythonOperator(task_id="ingestion_confirmed",
+# Ingestion Operator
+ingestion = PythonOperator(task_id="ingestion",
                             dag=dag,
                             python_callable=ingestion_process,
-                            provide_context=True,
-                            op_kwargs={'type': 'confirmed'})
+                            provide_context=True)
 
-ingestion_deaths = PythonOperator(task_id="ingestion_deaths",
-                            dag=dag,
-                            python_callable=ingestion_process,
-                            provide_context=True,
-                            op_kwargs={'type': 'deaths'})
-
-ingestion_recovered = PythonOperator(task_id="ingestion_recovered",
-                            dag=dag,
-                            python_callable=ingestion_process,
-                            provide_context=True,
-                            op_kwargs={'type': 'recovered'})
 
 # Dimensions and Fact Operator
 d_region = PythonOperator(task_id="d_region",
@@ -130,6 +120,6 @@ f_covid = PythonOperator(task_id="f_covid",
                             provide_context=True)
 
 start >> [sensor_confirmed, sensor_deaths, sensor_recovered] >> ingestions_stage
-ingestions_stage >> [ingestion_confirmed, ingestion_deaths, ingestion_recovered] >> dimensions_stage
+ingestions_stage >> ingestion >> dimensions_stage
 dimensions_stage >> [d_region, d_date] >> consolidation_stage
 consolidation_stage >> f_covid >> end
