@@ -53,5 +53,8 @@ La tarea de exploración del set de datos se puede observar en el jupyter notebo
 Transformaciones realizadas a los datos crudos:
 
 - Estandarizacion de Locaciones
+  - ![Locations](img/diff-locations.png)
 - Conversion de la representacion de datos de una representacion ancha (fechas como columnas) a una represetacion larga (una columna fecha, un registro por valor de fecha diferente)
+  - ![Wide-to-Long](img/transform-wide-long.png)
 - Calculo de diferencia de casos para una locacion entre dias consecutivos.
+  - ![deltas](img/compute-delta-cases.png)
