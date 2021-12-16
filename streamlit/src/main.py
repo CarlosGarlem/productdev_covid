@@ -58,13 +58,25 @@ def getMap(region_df):
                     ,locations = 'country_region'
                     ,color='confirmed'
                     ,color_continuous_scale = 'sunset'
-                    ,hover_data = ['confirmed', 'deaths', 'recovered']
+                    ,hover_data = {'confirmed': True, 'deaths': True, 'recovered': True, 'country_region': False}
                     ,hover_name = 'country_region'
                     ,title = 'Covid Confirmed Cases WorldWide'
                     ,locationmode='country names'
                   )
 
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    return fig
+
+
+def getLinePlot(df):
+    fig = px.line(df
+                ,x = 'date'
+                ,y = 'value'
+                ,color = 'variable'
+                ,hover_name = 'variable'
+                ,hover_data = {'date': True, 'value': True, 'variable': False}
+                ,title = 'Stadistísticas vs Tiempo'
+                ,template = 'none')
     return fig
 
 
@@ -99,23 +111,49 @@ with st.sidebar:
 
 
 #region Streamlit Dash
-region_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
+'''
+### KPIs
+'''
+
+
+
+'''
+### Mapa
+'''
+region_df = (covid_df.loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
+            .groupby(['country_region'], as_index = False)
             .agg(confirmed = ('confirmed_cases', np.max), deaths = ('death_cases', np.max), recovered = ('recovered_cases', np.max))
-            .loc[lambda df: (df.date.dt.date == date_range[0]) | (df.date.dt.date == date_range[1])]
-            .sort_values(by = ['country_region', 'date'])
-            .assign(diff_confirmed = lambda df: df.groupby(['country_region'])['confirmed'].diff()
-                   ,diff_deaths = lambda df: df.groupby(['country_region'])['deaths'].diff()
-                   ,diff_recovered = lambda df: df.groupby(['country_region'])['recovered'].diff()
-            )
-            .dropna(axis = 0, subset = ['diff_confirmed', 'diff_deaths', 'diff_recovered'])
-            .iloc[:, 0:-3]
-            .drop(axis = 1, labels = 'date')
+            .reset_index(drop = True)
 )
 if country_selector != 'All':
     region_df = region_df.loc[lambda df: (df.country_region == country_selector)]
 
 st.plotly_chart(getMap(region_df), use_container_width=True)
 region_df
+
+
+
+
+
+
+'''
+### Estadisticas generales
+'''
+line_graph_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
+                .agg(confirmed = ('confirmed_cases', np.max), deaths = ('death_cases', np.max), recovered = ('recovered_cases', np.max))
+                .loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
+                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed', 'deaths', 'recovered'])
+                .sort_values(by = ['country_region', 'date', 'variable'])
+                .reset_index(drop = True)
+)
+if country_selector != 'All':
+    line_graph_df = line_graph_df.loc[lambda df: (df.country_region == country_selector)]
+else:
+    line_graph_df = (line_graph_df.drop(labels = 'country_region', axis = 1).groupby(['date', 'variable'], as_index = False).sum())
+
+st.plotly_chart(getLinePlot(line_graph_df), use_container_width = True)
+
+
 
 
 #endregion

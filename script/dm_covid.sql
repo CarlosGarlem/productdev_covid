@@ -86,8 +86,11 @@ CREATE TABLE f_covid(
 
 DROP VIEW IF EXISTS covid_view;
 CREATE VIEW covid_view AS
-SELECT d_date.*
-     , d_region.*
+SELECT d_date.date
+     , d_region.country_region
+     , d_region.province_state
+     , d_region.lat
+     , d_region.`long`
      , f_covid.confirmed_cases
      , f_covid.death_cases
      , f_covid.recovered_cases
