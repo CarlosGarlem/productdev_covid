@@ -43,6 +43,19 @@ CREATE TABLE f_covid(
 );
 
 
+DROP VIEW IF EXISTS covid_view;
+CREATE VIEW covid_view AS
+SELECT d_date.*
+     , d_region.*
+     , f_covid.confirmed_cases
+     , f_covid.death_cases
+     , f_covid.recovered_cases
+FROM f_covid
+LEFT OUTER JOIN d_region
+ON f_covid.sk_region = d_region.sk_region
+LEFT OUTER JOIN d_date
+ON f_covid.sk_date = d_date.sk_date;
+
 
 #DATE DIM SP INSERT-----------------------------------------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS InsertCalendar;
