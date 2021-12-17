@@ -17,7 +17,7 @@ create table landing_deaths
 	lat float null,
 	`long` float null,
 	`date` date null,
-	n_cases int null
+	delta int null
 );
 
 
@@ -29,7 +29,7 @@ create table landing_recovered
 	lat float null,
 	`long` float null,
 	`date` date null,
-	n_cases int null
+	delta int null
 );
 
 
@@ -41,7 +41,7 @@ create table landing_confimed
 	lat float null,
 	`long` float null,
 	`date` date null,
-	n_cases int null
+	delta int null
 );
 
 

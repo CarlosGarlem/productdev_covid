@@ -36,9 +36,9 @@ class FactCovid:
                 select date
                     , country_region
                     , province_state
-                    , sum(case when source = 'confirmed' then n_cases else 0 end) as confirmed_cases
-                    , sum(case when source = 'deaths' then n_cases else 0 end) as death_cases
-                    , sum(case when source = 'recovered' then n_cases else 0 end) as recovered_cases
+                    , sum(case when source = 'confirmed' then delta else 0 end) as confirmed_cases
+                    , sum(case when source = 'deaths' then delta else 0 end) as death_cases
+                    , sum(case when source = 'recovered' then delta else 0 end) as recovered_cases
                 from landing
                 group by 1, 2, 3;
             """)

@@ -31,7 +31,7 @@ dag = DAG('covid_cases_dag',
             'max_active_runs': 1,
             'start_date': days_ago(1)
         },
-        schedule_interval='10 1 * * *',
+        schedule_interval='@once',
         catchup=False)
 
 # Stage Operators 
