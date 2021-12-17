@@ -15,7 +15,7 @@ COLUMNS_NAMES = {'Province/State': 'province_state',
                  'Lat': 'lat',
                  'Long': 'long',
                  'date': 'date',
-                 'n_cases': 'n_cases'}
+                 'delta': 'delta'}
 
 @dataclass
 class CovidFile:
