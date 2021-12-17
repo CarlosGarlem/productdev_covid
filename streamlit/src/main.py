@@ -59,6 +59,17 @@ def getLinePlot(df):
     return fig
 
 
+def get_region_stats(covid_df, country, date_range):
+    region_df = (covid_df.loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
+            .groupby(['country_region'], as_index = False)
+            .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
+            .reset_index(drop = True)
+    )
+    region_df.index = region_df.index + 1
+    if country != 'Todos':
+        region_df = region_df.loc[lambda df: (df.country_region == country)]
+    return region_df
+
 #endregion
 
 
@@ -99,30 +110,38 @@ with st.sidebar:
 #endregion
 
 
+st.write(start_date)
+st.write(type(start_date))
+region_df = get_region_stats(covid_df, country_selector, start_date)
 
 
 #region Streamlit Dash
 '''
 ### KPIs
 '''
+col1, col2, col3 = st.columns(3)
+kpi_res = region_df.sum(axis=0)
+with col1:
+    confirmed = kpi_res["confirmed"]
+    st.markdown("**Casos confirmados**")
+    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed}</h1>", unsafe_allow_html=True)
 
+with col2:
+    recovered = kpi_res["recovered"]
+    st.markdown("**Casos recuperados**")
+    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered}</h1>", unsafe_allow_html=True)
+
+
+with col3:
+    deaths = kpi_res["deaths"]
+    st.markdown("**Fallecimientos**")
+    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths}</h1>", unsafe_allow_html=True)
 
 
 
 '''
 ### Mapa de Calor
 '''
-st.write(start_date)
-st.write(type(start_date))
-
-region_df = (covid_df.loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
-            .groupby(['country_region'], as_index = False)
-            .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
-            .reset_index(drop = True)
-)
-region_df.index = region_df.index + 1
-if country_selector != 'Todos':
-    region_df = region_df.loc[lambda df: (df.country_region == country_selector)]
 
 st.plotly_chart(getMap(region_df), use_container_width=True)
 rcol1, rcol2, rcol3 = st.columns([1,2,1])
