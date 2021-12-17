@@ -44,9 +44,10 @@ El siguiente docker-compose tiene como objetivo:
 ### Evidencia de funcionamiento
 
 ![Funcionamiento](https://github.com/CarlosGarlem/productdev_covid/blob/main/img/execute.png?raw=true)
+
 ---
 
-### EDA
+## EDA
 
 La tarea de exploración del set de datos se puede observar en el jupyter notebook [EDA](https://github.com/CarlosGarlem/productdev_covid/blob/main/EDA/EDA.ipynb).
 
@@ -58,3 +59,15 @@ Transformaciones realizadas a los datos crudos:
   - ![Wide-to-Long](img/transform-wide-long.png)
 - Calculo de diferencia de casos para una locacion entre dias consecutivos.
   - ![deltas](img/compute-delta-cases.png)
+
+
+---
+
+## DataMart (DM)
+
+Para manejar los datos se optó por trabajar en una arquitectura basada en diagrama estrella, cuyo diagrama es el siguiente:
+![DB Diagram](img/StarSchema_CovidDW.png)
+
+Trabajar los datos de esta manera permitió elaborar un DataMart capaz de manejar las metrícas para los casos cnofirmados, fallecimientos y recuperaciones reportadas a partir de los diferentes niveles de granularidad proporcionados por las dimeniones de fechas y regiones. 
+
+La definición de las tablas puede encontrarse en el archivo de definición de ![SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/map_ideas/SQL/DW_DDL.sql)

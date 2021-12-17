@@ -32,35 +32,14 @@ def load_data(SQL_script):
 
 
 def getMap(region_df):
-
-    '''
-    fig = px.scatter_geo(plot_region
-                        ,lat = 'lat'
-                        ,lon = 'long'
-                        ,color = 'confirmed'
-                        ,size='confirmed' 
-                        ,template = 'ggplot2'
-                        ,color_continuous_scale='blugrn'
-                        ,range_color = (0,10)
-                        ,hover_name = 'province_state'
-                        #,size_max = 20
-                        ,title = 'Covid Confirmed Cases WorldWide'
-                        ,width = 1800
-                        ,scope = 'world'
-                        ,hover_data = ['confirmed', 'deaths', 'recovered']
-                        ,projection = 'robinson'
-                        #,animation_frame='sk_month'
-                        )
-    '''
-
-    
+   
     fig = px.choropleth(region_df
                     ,locations = 'country_region'
                     ,color='confirmed'
                     ,color_continuous_scale = 'sunset'
                     ,hover_data = {'confirmed': True, 'deaths': True, 'recovered': True, 'country_region': False}
                     ,hover_name = 'country_region'
-                    ,title = 'Covid Confirmed Cases WorldWide'
+                    ,title = 'Mapa de Calor - Casos de Covid'
                     ,locationmode='country names'
                   )
 
@@ -75,7 +54,7 @@ def getLinePlot(df):
                 ,color = 'variable'
                 ,hover_name = 'variable'
                 ,hover_data = {'date': True, 'value': True, 'variable': False}
-                ,title = 'Stadistísticas vs Tiempo'
+                ,title = 'Estadistísticas Acumuladas en el Tiempo'
                 ,template = 'none')
     return fig
 
@@ -89,22 +68,23 @@ st.title('COVID-19 Dashboard')
 
 covid_df = load_data(SQL_INIT_SCRIPT)
 
-countries = ['All']
+countries = ['Todos']
 countries.extend(covid_df['country_region'].unique().tolist())
 #endregion
 
 
 #region SidebarFilters
-st.sidebar.header('Covid Dashboard filters')
+st.sidebar.header('Filtros')
 with st.sidebar:
     #province_selector = st.selectbox('Choose a Province/State', covid_df['province_state'].unique())
-    country_selector = st.selectbox('Seleccione un Pais/Region:', countries)
-    date_range = st.date_input('Seleccione una fecha:'
+    country_selector = st.selectbox('Seleccione un País/Región:', countries)
+    date_range = st.date_input('Seleccione un rango de fechas:'
                         , value = (covid_df['date'].min(), covid_df['date'].max())
                         , min_value=covid_df['date'].min()
                         , max_value=covid_df['date'].max()
     )
     #date_range = st.sidebar.slider('Fechas:', value=[covid_df['date'].min(), covid_df['date'].max()])
+
 #endregion
 
 
@@ -117,43 +97,47 @@ with st.sidebar:
 
 
 
+
 '''
-### Mapa
+### Mapa de Calor
 '''
 region_df = (covid_df.loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
             .groupby(['country_region'], as_index = False)
-            .agg(confirmed = ('confirmed_cases', np.max), deaths = ('death_cases', np.max), recovered = ('recovered_cases', np.max))
+            .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
             .reset_index(drop = True)
 )
-if country_selector != 'All':
+region_df.index = region_df.index + 1
+if country_selector != 'Todos':
     region_df = region_df.loc[lambda df: (df.country_region == country_selector)]
 
 st.plotly_chart(getMap(region_df), use_container_width=True)
-region_df
-
+rcol1, rcol2, rcol3 = st.columns([1,2,1])
+with rcol2:
+    region_df
 
 
 
 
 
 '''
-### Estadisticas generales
+### Estadísticas generales
 '''
 line_graph_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
-                .agg(confirmed = ('confirmed_cases', np.max), deaths = ('death_cases', np.max), recovered = ('recovered_cases', np.max))
+                .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
+                .assign(confirmed_acu = lambda df: df.confirmed.cumsum(), deaths_acu = lambda df: df.deaths.cumsum(), recovered_acu = lambda df: df.recovered.cumsum())
                 .loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
-                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed', 'deaths', 'recovered'])
+                .drop(labels = ['confirmed', 'deaths', 'recovered'], axis = 1)
+                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed_acu', 'deaths_acu', 'recovered_acu'])
                 .sort_values(by = ['country_region', 'date', 'variable'])
                 .reset_index(drop = True)
 )
-if country_selector != 'All':
+
+if country_selector != 'Todos':
     line_graph_df = line_graph_df.loc[lambda df: (df.country_region == country_selector)]
 else:
     line_graph_df = (line_graph_df.drop(labels = 'country_region', axis = 1).groupby(['date', 'variable'], as_index = False).sum())
 
 st.plotly_chart(getLinePlot(line_graph_df), use_container_width = True)
-
-
 
 
 #endregion
