@@ -31,9 +31,9 @@ def load_data(SQL_script):
 
 
 
-def getMap(region_df):
+def getMap(df):
    
-    fig = px.choropleth(region_df
+    fig = px.choropleth(df
                     ,locations = 'country_region'
                     ,color='confirmed'
                     ,color_continuous_scale = 'sunset'
@@ -73,12 +73,13 @@ def get_region_stats(covid_df, country, date_range):
 #endregion
 
 
+
+
 #region General Data
 st.set_page_config(page_title = 'Streamlit COVID Dashboard', layout = 'wide')
 st.title('COVID-19 Dashboard')
 
 covid_df = load_data(SQL_INIT_SCRIPT)
-
 countries = ['Todos']
 countries.extend(covid_df['country_region'].unique().tolist())
 #endregion
@@ -89,12 +90,22 @@ st.sidebar.header('Filtros')
 with st.sidebar:
     #province_selector = st.selectbox('Choose a Province/State', covid_df['province_state'].unique())
     country_selector = st.selectbox('Seleccione un País/Región:', countries)
-    date_range = st.date_input('Seleccione un rango de fechas:'
-                        , value = (covid_df['date'].min(), covid_df['date'].max())
-                        , min_value=covid_df['date'].min()
-                        , max_value=covid_df['date'].max()
+    #date_range = st.date_input('Seleccione un rango de fechas:'
+    #                    , value = (covid_df['date'].min(), covid_df['date'].max())
+    #                    , min_value=covid_df['date'].min()
+    #                    , max_value=covid_df['date'].max()
+    #)
+    #date_range = st.sidebar.slider('Fechas:', value=[covid_df['date'].dt.date.min(), covid_df['date'].dt.date.max()])
+    start_date = st.date_input('Fecha Inicio:'
+                            , value = covid_df['date'].min()
+                            , min_value = covid_df['date'].min()
+                            , max_value = covid_df['date'].max()
     )
-    #date_range = st.sidebar.slider('Fechas:', value=[covid_df['date'].min(), covid_df['date'].max()])
+    end_date = st.date_input('Fecha Fin:'
+                            , value = covid_df['date'].max()
+                            , min_value = covid_df['date'].min()
+                            , max_value = covid_df['date'].max()
+    )
 
 #endregion
 
@@ -106,7 +117,9 @@ with st.sidebar:
 ### KPIs
 '''
 col1, col2, col3 = st.columns(3)
-region_df = get_region_stats(covid_df, country_selector, date_range)
+st.write(start_date)
+st.write(type(start_date))
+region_df = get_region_stats(covid_df, country_selector, start_date)
 kpi_res = region_df.sum(axis=0)
 with col1:
     confirmed = kpi_res["confirmed"]
@@ -130,7 +143,6 @@ with col3:
 ### Mapa de Calor
 '''
 
-
 st.plotly_chart(getMap(region_df), use_container_width=True)
 rcol1, rcol2, rcol3 = st.columns([1,2,1])
 with rcol2:
@@ -146,7 +158,7 @@ with rcol2:
 line_graph_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
                 .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
                 .assign(confirmed_acu = lambda df: df.confirmed.cumsum(), deaths_acu = lambda df: df.deaths.cumsum(), recovered_acu = lambda df: df.recovered.cumsum())
-                .loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
+                .loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
                 .drop(labels = ['confirmed', 'deaths', 'recovered'], axis = 1)
                 .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed_acu', 'deaths_acu', 'recovered_acu'])
                 .sort_values(by = ['country_region', 'date', 'variable'])
