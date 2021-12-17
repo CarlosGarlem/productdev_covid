@@ -70,4 +70,4 @@ Para manejar los datos se optó por trabajar en una arquitectura basada en diagr
 
 Trabajar los datos de esta manera permitió elaborar un DataMart capaz de manejar las metrícas para los casos cnofirmados, fallecimientos y recuperaciones reportadas a partir de los diferentes niveles de granularidad proporcionados por las dimeniones de fechas y regiones. 
 
-La definición de las tablas puede encontrarse en el archivo de definición de ![SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/map_ideas/SQL/DW_DDL.sql)
+La definición de las tablas puede encontrarse en el archivo de definición de ![SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/main/SQL/DW_DDL.sql)
