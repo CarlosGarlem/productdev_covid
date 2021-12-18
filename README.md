@@ -84,12 +84,13 @@ Transformaciones realizadas a los datos crudos:
 
 ## DataMart (DM)
 
-Para manejar los datos se optó por trabajar en una arquitectura basada en diagrama estrella, cuyo diagrama es el siguiente:
+Para manejar los datos se optó por trabajar en una arquitectura basada en diagrama estrella, cuyo diagrama es el siguiente:  
+
 ![DB Diagram](img/StarSchema_CovidDW.png)
 
 Trabajar los datos de esta manera permitió elaborar un DataMart capaz de manejar las metrícas para los casos cnofirmados, fallecimientos y recuperaciones reportadas a partir de los diferentes niveles de granularidad proporcionados por las dimeniones de fechas y regiones. 
 
-La definición de las tablas puede encontrarse en el archivo de definición de ![SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/main/SQL/DW_DDL.sql)
+La definición de las tablas puede encontrarse en el archivo de definición de [SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/main/SQL/DW_DDL.sql)
 
 ---
 
@@ -104,5 +105,5 @@ El dashboard construido se presenta en streamlit y permite un análisis general 
 - Diagrama de línea. Contiene información sobre los datos acumulados para cada una de las métricas según el país o región seleccionada. 
 - Filtros. Los filtros disponibles permiten seleccionar el país o región a evaluar, por defecto seleccionado todos para reflejar las estadísticas a nivel mundial. Adicionalmente se dispone de filtros para seleccionar los períodos de inicio y fin a evaluar.
 
-(img/Dashboard1.png)
-(img/Dashboard2.png)
+![Dash1](img/Dashboard1.png)
+![Dash2](img/Dashboard2.png)
