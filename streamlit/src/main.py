@@ -58,17 +58,9 @@ def getLinePlot(df):
                 ,template = 'none')
     return fig
 
-
-def get_region_stats(covid_df, country, date_range):
-    region_df = (covid_df.loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
-            .groupby(['country_region'], as_index = False)
-            .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
-            .reset_index(drop = True)
-    )
-    region_df.index = region_df.index + 1
-    if country != 'Todos':
-        region_df = region_df.loc[lambda df: (df.country_region == country)]
-    return region_df
+def getKPIs(df, metric):
+    kpi_res = df.sum(axis=0)
+    return kpi_res[metric]
 
 #endregion
 
@@ -89,19 +81,14 @@ countries.extend(covid_df['country_region'].unique().tolist())
 #region SidebarFilters
 st.sidebar.header('Filtros')
 with st.sidebar:
-    #province_selector = st.selectbox('Choose a Province/State', covid_df['province_state'].unique())
     country_selector = st.selectbox('Seleccione un País/Región:', countries)
-    #date_range = st.date_input('Seleccione un rango de fechas:'
-    #                    , value = (covid_df['date'].min(), covid_df['date'].max())
-    #                    , min_value=covid_df['date'].min()
-    #                    , max_value=covid_df['date'].max()
-    #)
-    #date_range = st.sidebar.slider('Fechas:', value=[covid_df['date'].dt.date.min(), covid_df['date'].dt.date.max()])
+
     start_date = st.date_input('Fecha Inicio:'
                             , value = covid_df['date'].min()
                             , min_value = covid_df['date'].min()
                             , max_value = covid_df['date'].max()
     )
+
     end_date = st.date_input('Fecha Fin:'
                             , value = covid_df['date'].max()
                             , min_value = covid_df['date'].min()
@@ -115,25 +102,32 @@ with st.sidebar:
 '''
 ### KPIs
 '''
-region_df = get_region_stats(covid_df, country_selector, (start_date, end_date))
+region_df = (covid_df.loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
+        .groupby(['country_region'], as_index = False)
+        .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
+        .reset_index(drop = True)
+)
+region_df.index = region_df.index + 1
+if country != 'Todos':
+    region_df = region_df.loc[lambda df: (df.country_region == country_selector)]
+
+
 
 col1, col2, col3 = st.columns(3)
-kpi_res = region_df.sum(axis=0)
 with col1:
-    confirmed = kpi_res["confirmed"]
     st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Casos Confirmados</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='text-align:center; color:#ffde24;'>{confirmed:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:#ffde24;'>{getKPIs(region_df, 'confirmed'):,.0f}</h1>", unsafe_allow_html=True)
 
 with col2:
     recovered = kpi_res["recovered"]
     st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Casos Recuperados</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='text-align:center; color:#00ad00;'>{recovered:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:#00ad00;'>{getKPIs(region_df, 'recovered'):,.0f}</h1>", unsafe_allow_html=True)
 
 
 with col3:
     deaths = kpi_res["deaths"]
     st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Muertes</h1>", unsafe_allow_html=True)
-    st.markdown(f"<h1 style='text-align:center; color:red;'>{deaths:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:red;'>{getKPIs(region_df, 'deaths'):,.0f}</h1>", unsafe_allow_html=True)
 
 
 
@@ -145,8 +139,6 @@ st.plotly_chart(getMap(region_df), use_container_width=True)
 rcol1, rcol2, rcol3 = st.columns([1,2,1])
 with rcol2:
     region_df
-
-
 
 
 
