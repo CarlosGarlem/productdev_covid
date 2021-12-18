@@ -144,21 +144,22 @@ with rcol2:
 '''
 ### Estadísticas generales
 '''
-line_graph_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
-                .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
-                .assign(confirmed_acu = lambda df: df.confirmed.cumsum(), deaths_acu = lambda df: df.deaths.cumsum(), recovered_acu = lambda df: df.recovered.cumsum())
-                .loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
-                .drop(labels = ['confirmed', 'deaths', 'recovered'], axis = 1)
-                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed_acu', 'recovered_acu', 'deaths_acu'])
-                .sort_values(by = ['country_region', 'date', 'variable'])
-                .reset_index(drop = True)
-)
 
 if country_selector != 'Todos':
-    line_graph_df = line_graph_df.loc[lambda df: (df.country_region == country_selector)]
+    aux_df = covid_df.loc[lambda df: (df.country_region == country_selector)]
 else:
-    line_graph_df = (line_graph_df.drop(labels = 'country_region', axis = 1).groupby(['date', 'variable'], as_index = False).sum())
+    aux_df = covid_df
 
+line_graph_df = (aux_df.groupby(['date'], as_index = False)
+            .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
+            .assign(confirmed_acu = lambda df: df.confirmed.cumsum(), deaths_acu = lambda df: df.deaths.cumsum(), recovered_acu = lambda df: df.recovered.cumsum())
+            .loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
+            .drop(labels = ['confirmed', 'deaths', 'recovered'], axis = 1)
+            .melt(id_vars = ['date'], value_vars = ['confirmed_acu', 'recovered_acu', 'deaths_acu'])
+            .sort_values(by = ['date', 'variable'])
+            .reset_index(drop = True)
+)
+    
 st.plotly_chart(getLinePlot(line_graph_df), use_container_width = True)
 
 
