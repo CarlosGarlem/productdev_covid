@@ -62,7 +62,7 @@ def getLinePlot(df):
 def get_region_stats(covid_df, country, date_range):
     region_df = (covid_df.loc[lambda df: (df.date.dt.date >= date_range[0]) | (df.date.dt.date <= date_range[1])]
             .groupby(['country_region'], as_index = False)
-            .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
+            .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
             .reset_index(drop = True)
     )
     region_df.index = region_df.index + 1
@@ -83,7 +83,6 @@ covid_df = load_data()
 countries = ['Todos']
 countries.extend(covid_df['country_region'].unique().tolist())
 
-region_df = get_region_stats(covid_df, country_selector, (start_date, end_date))
 #endregion
 
 
@@ -116,23 +115,25 @@ with st.sidebar:
 '''
 ### KPIs
 '''
+region_df = get_region_stats(covid_df, country_selector, (start_date, end_date))
+
 col1, col2, col3 = st.columns(3)
 kpi_res = region_df.sum(axis=0)
 with col1:
     confirmed = kpi_res["confirmed"]
-    st.markdown("**Casos confirmados**")
-    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Casos Confirmados</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:#ffde24;'>{confirmed:,.0f}</h1>", unsafe_allow_html=True)
 
 with col2:
     recovered = kpi_res["recovered"]
-    st.markdown("**Casos recuperados**")
-    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Casos Recuperados</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:#00ad00;'>{recovered:,.0f}</h1>", unsafe_allow_html=True)
 
 
 with col3:
     deaths = kpi_res["deaths"]
-    st.markdown("**Fallecimientos**")
-    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths:,.0f}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Muertes</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:center; color:red;'>{deaths:,.0f}</h1>", unsafe_allow_html=True)
 
 
 
@@ -153,11 +154,11 @@ with rcol2:
 ### Estadísticas generales
 '''
 line_graph_df = (covid_df.groupby(['country_region', 'date'], as_index = False)
-                .agg(confirmed = ('confirmed_cases', np.sum), deaths = ('death_cases', np.sum), recovered = ('recovered_cases', np.sum))
+                .agg(confirmed = ('confirmed_cases', np.sum), recovered = ('recovered_cases', np.sum), deaths = ('death_cases', np.sum))
                 .assign(confirmed_acu = lambda df: df.confirmed.cumsum(), deaths_acu = lambda df: df.deaths.cumsum(), recovered_acu = lambda df: df.recovered.cumsum())
                 .loc[lambda df: (df.date.dt.date >= start_date) & (df.date.dt.date <= end_date)]
                 .drop(labels = ['confirmed', 'deaths', 'recovered'], axis = 1)
-                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed_acu', 'deaths_acu', 'recovered_acu'])
+                .melt(id_vars = ['country_region', 'date'], value_vars = ['confirmed_acu', 'recovered_acu', 'deaths_acu'])
                 .sort_values(by = ['country_region', 'date', 'variable'])
                 .reset_index(drop = True)
 )

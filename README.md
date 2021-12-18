@@ -90,3 +90,19 @@ Para manejar los datos se optó por trabajar en una arquitectura basada en diagr
 Trabajar los datos de esta manera permitió elaborar un DataMart capaz de manejar las metrícas para los casos cnofirmados, fallecimientos y recuperaciones reportadas a partir de los diferentes niveles de granularidad proporcionados por las dimeniones de fechas y regiones. 
 
 La definición de las tablas puede encontrarse en el archivo de definición de ![SQL del proyecto](https://github.com/CarlosGarlem/productdev_covid/blob/main/SQL/DW_DDL.sql)
+
+---
+
+## Dashboard
+
+El dashboard construido se presenta en streamlit y permite un análisis general de los datos recolectados con respecto a Covid-19, para ver los resultados ingresar a <http://localhost:8501/>
+
+**Estructura**
+- KPIs. Indicadores generales de las metrícas principales (casos confirmados, casos recuperados y fallecimientos)
+- Mapa de calor. El mapa de calor se basa en los casos confirmados, y presenta un resumen de las estadísticas de las 3 métricas en el tooltip.
+- Tabla. Contiene información de los países y sus métricas según lo seleccionado. 
+- Diagrama de línea. Contiene información sobre los datos acumulados para cada una de las métricas según el país o región seleccionada. 
+- Filtros. Los filtros disponibles permiten seleccionar el país o región a evaluar, por defecto seleccionado todos para reflejar las estadísticas a nivel mundial. Adicionalmente se dispone de filtros para seleccionar los períodos de inicio y fin a evaluar.
+
+(img/Dashboard1.png)
+(img/Dashboard2.png)

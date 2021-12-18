@@ -91,9 +91,9 @@ SELECT d_date.date
      , d_region.province_state
      , d_region.lat
      , d_region.`long`
-     , f_covid.confirmed_cases
-     , f_covid.death_cases
-     , f_covid.recovered_cases
+     , IF(f_covid.confirmed_cases < 0, 0, f_covid.confirmed_cases)      as confirmed_cases
+     , IF(f_covid.death_cases < 0, 0, f_covid.death_cases)              as death_cases
+     , IF(f_covid.recovered_cases < 0, 0, f_covid.recovered_cases)      as recovered_cases
 FROM f_covid
 LEFT OUTER JOIN d_region
 ON f_covid.sk_region = d_region.sk_region
