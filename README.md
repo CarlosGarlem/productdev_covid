@@ -105,5 +105,5 @@ El dashboard construido se presenta en streamlit y permite un análisis general 
 - Diagrama de línea. Contiene información sobre los datos acumulados para cada una de las métricas según el país o región seleccionada. 
 - Filtros. Los filtros disponibles permiten seleccionar el país o región a evaluar, por defecto seleccionado todos para reflejar las estadísticas a nivel mundial. Adicionalmente se dispone de filtros para seleccionar los períodos de inicio y fin a evaluar.
 
-![Dash1](img/Dashboard1.png)
-![Dash2](img/Dashboard2.png)
+![Dash1](img/Dashboard_1.png)
+![Dash2](img/Dashboard_2.png)
