@@ -121,18 +121,18 @@ kpi_res = region_df.sum(axis=0)
 with col1:
     confirmed = kpi_res["confirmed"]
     st.markdown("**Casos confirmados**")
-    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed:,.0f}</h1>", unsafe_allow_html=True)
 
 with col2:
     recovered = kpi_res["recovered"]
     st.markdown("**Casos recuperados**")
-    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered:,.0f}</h1>", unsafe_allow_html=True)
 
 
 with col3:
     deaths = kpi_res["deaths"]
     st.markdown("**Fallecimientos**")
-    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths:,.0f}</h1>", unsafe_allow_html=True)
 
 
 
