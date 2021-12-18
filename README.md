@@ -38,13 +38,16 @@ El siguiente docker-compose tiene como objetivo:
 
 La lógica del Dag está compuesta por 4 fases principales.
  
-  1. Start Stage
+  1. **Start Stage**:
     Esta primera fase consta de 3 sensores uno por cada archivo de información, los sensores fueron configurados para chequear cada 10 segundos durante 10 minutos la existencia de un archivo en un directorio específico.
-  2. Ingestion Stage
+
+  2. **Ingestion Stage**:
     La fase de ingestión es ejecutada una vez los 3 sensores anteriores hayan encontrado los archivos específicos en el directorio. Por cada archivo se realizan una serie de transformaciones, como arreglos a coordenadas, trato de Nulos y transposición de los datos incluyendo su cálculo de casos en deltas. Finalmente cada archivo es insertado en una tabla específica de su tipo de dato. Estas tablas son `landing_recovered, landing_confirmed, landing_deaths`).
-  3. Dimensions Stage
+
+  3. **Dimensions Stage**:
     La fase de dimensiones realiza dos tareas, crear la dimensión de fechas a partir de extraer el rango de fechas de las 3 tablas de landing y la creación de la dimensión de regiones a través de seleccionar las regiones únicas de las 3 tablas de landing.
-  4. Consolidation Stage
+
+  4. **Consolidation Stage**:
     Una vez creadas las dimensiones necesarias, se procede a la creación y consolidación de la información en una tabla de hechos `f_covid` la cual estará consolidada por fecha y región, la cantidad de casos recuperados, confirmados y muertes.
 
 
