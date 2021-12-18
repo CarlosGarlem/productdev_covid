@@ -59,7 +59,7 @@ Transformaciones realizadas a los datos crudos:
   - ![Wide-to-Long](img/transform-wide-long.png)
 - Calculo de diferencia de casos para una locacion entre dias consecutivos.
   - ![deltas](img/compute-delta-cases.png)
-
+- Estandarización de representacion de valores desconocidos (UNK).
 
 ---
 
