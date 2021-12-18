@@ -29,6 +29,9 @@ def transform_compute_delta(df):
     ### Fix first observation for each Country - Province
     different_loc = df[['Country/Region', "Province/State"]].drop_duplicates().shape[0]
     res.loc[range(0, different_loc), "delta"] = res.loc[range(0, different_loc), "n_cases"]
+
+    ### Fix negative deltas
+    res["delta"] = res["delta"].clip(0, None)
     return res
 
 # Fix Unknown label

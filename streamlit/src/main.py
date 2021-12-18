@@ -21,10 +21,10 @@ def get_connection():
 
 
 @st.cache(suppress_st_warning = True)
-def load_data(SQL_script):
+def load_data():
     with st.spinner('Cargando datos...'):
         time.sleep(0.2)
-        df = (pd.read_sql_query(SQL_script, get_connection())
+        df = (pd.read_sql_query(SQL_INIT_SCRIPT, get_connection())
             .assign(date = lambda df: pd.to_datetime(df.date))
         )
     return df
@@ -79,9 +79,11 @@ def get_region_stats(covid_df, country, date_range):
 st.set_page_config(page_title = 'Streamlit COVID Dashboard', layout = 'wide')
 st.title('COVID-19 Dashboard')
 
-covid_df = load_data(SQL_INIT_SCRIPT)
+covid_df = load_data()
 countries = ['Todos']
 countries.extend(covid_df['country_region'].unique().tolist())
+
+region_df = get_region_stats(covid_df, country_selector, (start_date, end_date))
 #endregion
 
 
@@ -110,32 +112,27 @@ with st.sidebar:
 #endregion
 
 
-
-
 #region Streamlit Dash
 '''
 ### KPIs
 '''
 col1, col2, col3 = st.columns(3)
-st.write(start_date)
-st.write(type(start_date))
-region_df = get_region_stats(covid_df, country_selector, start_date)
 kpi_res = region_df.sum(axis=0)
 with col1:
     confirmed = kpi_res["confirmed"]
     st.markdown("**Casos confirmados**")
-    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:#ffde24;'>{confirmed:,.0f}</h1>", unsafe_allow_html=True)
 
 with col2:
     recovered = kpi_res["recovered"]
     st.markdown("**Casos recuperados**")
-    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:#00ad00;'>{recovered:,.0f}</h1>", unsafe_allow_html=True)
 
 
 with col3:
     deaths = kpi_res["deaths"]
     st.markdown("**Fallecimientos**")
-    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align:right; color:red;'>{deaths:,.0f}</h1>", unsafe_allow_html=True)
 
 
 

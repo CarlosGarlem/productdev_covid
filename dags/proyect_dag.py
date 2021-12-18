@@ -35,7 +35,7 @@ dag = DAG('covid_cases_dag',
         catchup=False)
 
 # Stage Operators 
-start = DummyOperator(task_id='start', dag=dag)
+start_stage = DummyOperator(task_id='start_stage', dag=dag)
 
 ingestions_stage = DummyOperator(task_id='ingestions_stage', dag=dag)
 
@@ -119,7 +119,7 @@ f_covid = PythonOperator(task_id="f_covid",
                             python_callable=build_fact_covid,
                             provide_context=True)
 
-start >> [sensor_confirmed, sensor_deaths, sensor_recovered] >> ingestions_stage
+start_stage >> [sensor_confirmed, sensor_deaths, sensor_recovered] >> ingestions_stage
 ingestions_stage >> ingestion >> dimensions_stage
 dimensions_stage >> [d_region, d_date] >> consolidation_stage
 consolidation_stage >> f_covid >> end
