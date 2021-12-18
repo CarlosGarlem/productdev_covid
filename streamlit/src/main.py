@@ -119,13 +119,11 @@ with col1:
     st.markdown(f"<h1 style='text-align:center; color:#ffde24;'>{getKPIs(region_df, 'confirmed'):,.0f}</h1>", unsafe_allow_html=True)
 
 with col2:
-    recovered = kpi_res["recovered"]
     st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Casos Recuperados</h1>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align:center; color:#00ad00;'>{getKPIs(region_df, 'recovered'):,.0f}</h1>", unsafe_allow_html=True)
 
 
 with col3:
-    deaths = kpi_res["deaths"]
     st.markdown(f"<h1 style='text-align:center; font-weight: bold; font-size: 20px;'>Muertes</h1>", unsafe_allow_html=True)
     st.markdown(f"<h1 style='text-align:center; color:red;'>{getKPIs(region_df, 'deaths'):,.0f}</h1>", unsafe_allow_html=True)
 
