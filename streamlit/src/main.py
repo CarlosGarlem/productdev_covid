@@ -108,7 +108,7 @@ region_df = (covid_df.loc[lambda df: (df.date.dt.date >= start_date) & (df.date.
         .reset_index(drop = True)
 )
 region_df.index = region_df.index + 1
-if country != 'Todos':
+if country_selector != 'Todos':
     region_df = region_df.loc[lambda df: (df.country_region == country_selector)]
 
 
