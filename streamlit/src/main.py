@@ -21,10 +21,10 @@ def get_connection():
 
 
 @st.cache(suppress_st_warning = True)
-def load_data(SQL_script):
+def load_data():
     with st.spinner('Cargando datos...'):
         time.sleep(0.2)
-        df = (pd.read_sql_query(SQL_script, get_connection())
+        df = (pd.read_sql_query(SQL_INIT_SCRIPT, get_connection())
             .assign(date = lambda df: pd.to_datetime(df.date))
         )
     return df
@@ -79,7 +79,7 @@ def get_region_stats(covid_df, country, date_range):
 st.set_page_config(page_title = 'Streamlit COVID Dashboard', layout = 'wide')
 st.title('COVID-19 Dashboard')
 
-covid_df = load_data(SQL_INIT_SCRIPT)
+covid_df = load_data()
 countries = ['Todos']
 countries.extend(covid_df['country_region'].unique().tolist())
 #endregion
@@ -109,10 +109,7 @@ with st.sidebar:
 
 #endregion
 
-
-st.write(start_date)
-st.write(type(start_date))
-region_df = get_region_stats(covid_df, country_selector, start_date)
+region_df = get_region_stats(covid_df, country_selector, (start_date, end_date))
 
 
 #region Streamlit Dash
