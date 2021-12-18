@@ -135,8 +135,9 @@ with col3:
 
 st.plotly_chart(getMap(region_df), use_container_width=True)
 rcol1, rcol2, rcol3 = st.columns([1,2,1])
+region_df_spanish = region_df.copy().rename(columns={'country_region': 'País/Región', 'confirmed': 'Confirmados', 'recovered': 'Recuperados', 'deaths': 'Muertes'})
 with rcol2:
-    region_df
+    region_df_spanish
 
 
 

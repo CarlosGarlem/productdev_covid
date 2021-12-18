@@ -48,7 +48,7 @@ class CovidFile:
                             if_exists='replace', 
                             index=False,
                             dtype={'date': sqlalchemy.Date()},
-                            chunksize=1000,
+                            chunksize=5000,
                             method='multi')
 
     def run(self):
